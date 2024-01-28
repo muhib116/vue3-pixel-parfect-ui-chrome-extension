@@ -3,7 +3,7 @@
         <Icon
             name="image"
             size="50"
-            class="absolute z-10 bg-white/80 p-2 rounded shadow inset-1/2 -translate-x-1/2 -translate-y-1/2"
+            class="absolute pointer-events-none z-10 bg-white/80 p-2 rounded shadow inset-1/2 -translate-x-1/2 -translate-y-1/2"
         />
         <label 
             class="border h-full overflow-auto block cursor-pointer relative"
