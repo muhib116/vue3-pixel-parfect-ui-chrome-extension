@@ -11,67 +11,80 @@ export const useConfig = () => {
         showImage: true,
         fileInput: null,
         zIndex: 1000,
-        isLock: true,
+        isLock: false,
         isShow: true,
     }
-    const imageData = ref({...placeholderConfig})
-
-    const runWebPageScript = (imageData) => {
-        imageData.img = document.getElementById('_overlayImage_pixelPerfect')
-        if(!imageData.img){
-            imageData.img = document.createElement('img')
+    const layoutData = ref({
+        activeIndex: 0,
+        config: []
+    })
+    const addNewLayout = (element) => {
+        layoutData.value.config.unshift({...placeholderConfig})
+        if(element[0]){
+            element[0].click()
+        }
+    }
+    const deleteLayout = (index, layoutData) => {
+        if(!confirm('Are you sure you want to delete this layout?')) return
+        layoutData.config.splice(index, 1)
+    }
+    const runWebPageScript = (layoutData) => {
+        layoutData.img = document.getElementById('_overlayImage_pixelPerfect')
+        if(!layoutData.img){
+            layoutData.img = document.createElement('img')
         }
 
-        if(!imageData.fileInput) {
-            imageData.img.remove()
+        if(!layoutData.fileInput) {
+            layoutData.img.remove()
             return
         }
 
-        imageData.img.src = imageData.fileInput
-        imageData.img.setAttribute('id', '_overlayImage_pixelPerfect')
-        document.body.appendChild(imageData.img)
+        layoutData.img.src = layoutData.fileInput
+        layoutData.img.setAttribute('id', '_overlayImage_pixelPerfect')
+        document.body.appendChild(layoutData.img)
 
-        imageData.img.style.cssText = `
-            width: ${imageData.width}px;
-            height: ${imageData.height}px;
-            left: ${imageData.left}px;
-            top: ${imageData.top}px;
-            opacity: ${imageData.opacity};
-            z-index: ${imageData.zIndex};
+        layoutData.img.style.cssText = `
+            width: ${layoutData.width}px;
+            height: ${layoutData.height}px;
+            left: ${layoutData.left}px;
+            top: ${layoutData.top}px;
+            opacity: ${layoutData.opacity};
+            z-index: ${layoutData.zIndex};
             position: fixed;
-            pointer-events: ${imageData.isLock ? 'none' : 'auto'};
-            display: ${imageData.isShow? '' : 'none'};
+            pointer-events: ${layoutData.isLock ? 'none' : 'move'};
+            display: ${layoutData.isShow? '' : 'none'};
         `
     }
 
-    const storeInLocalStorage = (imageData) => {
-        localStorage.setItem('_pixelPerfectImageData', JSON.stringify(imageData))
+    const storeInLocalStorage = (layoutData) => {
+        localStorage.setItem('_pixelPerfectlayoutData', JSON.stringify(layoutData))
     }
     const loadFromLocalStorage = () => {
-        let localStorageImageData = JSON.parse(localStorage.getItem('_pixelPerfectImageData'))
-        imageData.value = localStorageImageData ? localStorageImageData : imageData.value
+        let localStoragelayoutData = JSON.parse(localStorage.getItem('_pixelPerfectlayoutData'))
+        layoutData.value = localStoragelayoutData ? localStoragelayoutData : layoutData.value
     }
     const deleteInLocalStorage = () => {
-        localStorage.clear('_pixelPerfectImageData')
+        localStorage.clear('_pixelPerfectlayoutData')
     }
 
     const resetConfiguration = () => {
         if(!confirm('Are you sure you want to reset your configuration')) return
         deleteInLocalStorage()
-        imageData.value = placeholderConfig
+        layoutData.value.activeIndex = 0
+        layoutData.value.config = placeholderConfig
     }
     
-    const runChromeScript = (imageData) => 
+    const runChromeScript = (layoutData) => 
     {
         if(!chrome.tabs) return
         chrome.tabs.query({active: true}, function(tabs) {
             var tab = tabs[0];
-            if (tab) {
+            if (tab && layoutData.config[layoutData.activeIndex]) {
                 chrome.scripting.executeScript(
                 {
                     target:{tabId: tab.id, allFrames: true},
                     func: runWebPageScript,
-                    args: [imageData]
+                    args: [layoutData.config[layoutData.activeIndex]]
                 },
                 // onResult
               )
@@ -81,7 +94,9 @@ export const useConfig = () => {
 
     
     return {
-        imageData,
+        layoutData,
+        deleteLayout,
+        addNewLayout,
         loadFromLocalStorage,
         resetConfiguration,
         runChromeScript,

@@ -5,7 +5,7 @@
           title="If locked, image not selectable"
         >
             <input 
-              v-model="imageData.isLock"
+              v-model="config.isLock"
               type="checkbox" 
               class="bg-transparent"
             />
@@ -18,7 +18,7 @@
             <input 
               type="checkbox"
               class="bg-transparent"
-              v-model="imageData.isShow"
+              v-model="config.isShow"
             />
             Show
         </label>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-  import { inject } from 'vue'
-
-  const { imageData } = inject('useConfig')
+  defineProps({
+    config: Object
+  })
 </script>

@@ -1,22 +1,28 @@
 <template>
-  <div class="p-6 text-sm bg-slate-100 grid gap-2 w-[400px]">
-    <FileUpload
-      class="gap-2"
-    />
-    <template 
-      v-if="imageData.fileInput"
+  <div class="p-6 text-sm bg-slate-100 grid gap-2 w-[300px]">
+
+    <div class="max-h-[252px] overflow-auto">
+        <FileUpload />
+    </div>
+
+    <template
+      v-if="layoutData.config.length && layoutData.config[layoutData.activeIndex]"
     >
       <WidthAndHeight
         class="gap-2"
+        :config="layoutData.config[layoutData.activeIndex]"
       />
       <Position
         class="gap-2"
+        :config="layoutData.config[layoutData.activeIndex]"
       />
       <OpacityAndZIndex
         class="gap-2"
+        :config="layoutData.config[layoutData.activeIndex]"
       />
       <Toggle
         class="gap-2 mt-2"
+        :config="layoutData.config[layoutData.activeIndex]"
       />
     </template>
     <Footer
@@ -40,22 +46,22 @@
 
   const { 
     runChromeScript,
-    imageData,
+    layoutData,
     storeInLocalStorage,
     loadFromLocalStorage
   } = localUseConfig
 
  
 
-  watch(imageData, () => 
+  watch(layoutData, () => 
   {
-    runChromeScript(imageData.value)
-    if(!imageData.value.fileInput) return
-    storeInLocalStorage(imageData.value)
+    if(!layoutData.value.config.length) return
+    runChromeScript(layoutData.value)
+    storeInLocalStorage(layoutData.value)
   }, { deep: true, immediate: true })
   
   onMounted(() => {
     loadFromLocalStorage()
-    runChromeScript(imageData.value)
+    runChromeScript(layoutData.value)
   })
 </script>

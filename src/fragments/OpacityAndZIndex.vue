@@ -7,14 +7,14 @@
           step="0.1"
           title="Ex: between 0 and 1, like: 0.5"
           class="px-2 py-1 rounded"
-          v-model="imageData.opacity"
+          v-model="config.opacity"
           placeholder="Opacity"
           label="Opacity"
         />
         <Input 
           type="number"
           class="px-2 py-1 rounded"
-          v-model="imageData.zIndex"
+          v-model="config.zIndex"
           placeholder="Z-Index"
           label="Z-Index"
         />
@@ -22,8 +22,9 @@
 </template>
 
 <script setup>
-    import { inject } from 'vue'
     import Input from '@/components/Input.vue'
 
-    const { imageData } = inject('useConfig')
+    defineProps({
+      config: Object
+    })
 </script>

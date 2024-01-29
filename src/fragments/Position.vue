@@ -4,7 +4,7 @@
           type="number"
           title="Enter value in px"
           class="px-2 py-1 rounded"
-          v-model="imageData.left"
+          v-model="config.left"
           placeholder="Left Position"
           label="Left Position"
         />
@@ -12,7 +12,7 @@
           type="number"
           title="Enter value in px"
           class="px-2 py-1 rounded"
-          v-model="imageData.top"
+          v-model="config.top"
           placeholder="Top Position"
           label="Top Position"
         />
@@ -20,8 +20,9 @@
 </template>
 
 <script setup>
-    import { inject } from 'vue'
     import Input from '@/components/Input.vue'
 
-    const { imageData } = inject('useConfig')
+    defineProps({
+      config: Object
+    })
 </script>
