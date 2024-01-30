@@ -41,6 +41,7 @@ export const useConfig = () => {
 
         layoutData.img.src = layoutData.fileInput
         layoutData.img.setAttribute('id', '_overlayImage_pixelPerfect')
+        layoutData.img.setAttribute('draggable', 'false')
         document.body.appendChild(layoutData.img)
 
         layoutData.img.style.cssText = `
@@ -54,7 +55,32 @@ export const useConfig = () => {
             pointer-events: ${layoutData.isLock ? 'none' : 'move'};
             display: ${layoutData.isShow? '' : 'none'};
         `
+        
+        let isMouseDown = false
+        let mouseDownPosition = { x: 0, y: 0}
+        let distance = { left: 0, top: 0 }
+        layoutData.img.onmousedown = function(e) {
+            mouseDownPosition.x = e.clientX
+            mouseDownPosition.y = e.clientY
+            isMouseDown = true
+        }
+        
+        layoutData.img.onmousemove = function(e) {
+            if(!isMouseDown) return
+            distance.left = e.clientX - mouseDownPosition.x
+            distance.top = e.clientY - mouseDownPosition.y
+            
+            if(layoutData){
+                layoutData.img.style.left = layoutData.left + distance.left + 'px'
+                layoutData.img.style.top = layoutData.top + distance.top + 'px'
+            }
+        }
+        
+        window.onmouseup = function() {
+            isMouseDown = false
+        }
     }
+
 
     const storeInLocalStorage = (layoutData) => {
         localStorage.setItem('_pixelPerfectlayoutData', JSON.stringify(layoutData))
@@ -76,21 +102,22 @@ export const useConfig = () => {
     
     const runChromeScript = (layoutData) => 
     {
-        if(!chrome.tabs) return
-        chrome.tabs.query({active: true}, function(tabs) {
-            var tab = tabs[0];
-            if (tab && layoutData.config[layoutData.activeIndex]) {
-                chrome.scripting.executeScript(
-                {
-                    target:{tabId: tab.id, allFrames: true},
-                    func: runWebPageScript,
-                    args: [layoutData.config[layoutData.activeIndex]]
-                },
-                // onResult
-              )
-            }
+        chrome.runtime.sendMessage({
+            type: 'layoutData',
+            data: layoutData
         })
+        storeInLocalStorage(layoutData)
     }
+
+
+    chrome.runtime.onMessage.addListener((request) => {
+        if(request.type == "updatedActiveLayoutData")
+        {
+            const activeLayout = layoutData.value[layoutData.value.activeIndex]
+            activeLayout.left = request.data.left
+            activeLayout.top = request.data.top
+        }
+    })
 
     
     return {

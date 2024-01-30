@@ -10,6 +10,7 @@
           v-model="config.opacity"
           placeholder="Opacity"
           label="Opacity"
+          @input="runChromeScript"
         />
         <Input 
           type="number"
@@ -17,6 +18,7 @@
           v-model="config.zIndex"
           placeholder="Z-Index"
           label="Z-Index"
+          @input="runChromeScript"
         />
     </div>
 </template>
@@ -25,6 +27,7 @@
     import Input from '@/components/Input.vue'
 
     defineProps({
-      config: Object
+      config: Object,
+      runChromeScript: Function
     })
 </script>

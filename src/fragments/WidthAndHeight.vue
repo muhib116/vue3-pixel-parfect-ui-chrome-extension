@@ -7,6 +7,7 @@
           v-model="config.width"
           placeholder="Width"
           label="Width"
+          @input="runChromeScript"
         />
         <Input 
           type="number"
@@ -15,6 +16,7 @@
           v-model="config.height"
           placeholder="Height"
           label="Height"
+          @input="runChromeScript"
         />
     </div>
 </template>
@@ -23,6 +25,7 @@
     import Input from '@/components/Input.vue'
 
     defineProps({
-      config: Object
+      config: Object,
+      runChromeScript: Function
     })
 </script>

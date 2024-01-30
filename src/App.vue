@@ -10,18 +10,22 @@
     >
       <WidthAndHeight
         class="gap-2"
+        :runChromeScript="() => runChromeScript(layoutData)"
         :config="layoutData.config[layoutData.activeIndex]"
       />
       <Position
         class="gap-2"
+        :runChromeScript="() => runChromeScript(layoutData)"
         :config="layoutData.config[layoutData.activeIndex]"
       />
       <OpacityAndZIndex
         class="gap-2"
+        :runChromeScript="() => runChromeScript(layoutData)"
         :config="layoutData.config[layoutData.activeIndex]"
       />
       <Toggle
         class="gap-2 mt-2"
+        :runChromeScript="() => runChromeScript(layoutData)"
         :config="layoutData.config[layoutData.activeIndex]"
       />
     </template>
@@ -33,7 +37,7 @@
 
 <script setup>
   import { useConfig } from './useConfig'
-  import { provide, watch, onMounted } from 'vue'
+  import { provide, onMounted } from 'vue'
   import FileUpload from './fragments/FileUpload.vue'
   import WidthAndHeight from './fragments/WidthAndHeight.vue'
   import Position from './fragments/Position.vue'
@@ -47,19 +51,9 @@
   const { 
     runChromeScript,
     layoutData,
-    storeInLocalStorage,
     loadFromLocalStorage
   } = localUseConfig
 
- 
-
-  watch(layoutData, () => 
-  {
-    if(!layoutData.value.config.length) return
-    runChromeScript(layoutData.value)
-    storeInLocalStorage(layoutData.value)
-  }, { deep: true, immediate: true })
-  
   onMounted(() => {
     loadFromLocalStorage()
     runChromeScript(layoutData.value)

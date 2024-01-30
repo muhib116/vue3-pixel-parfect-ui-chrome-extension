@@ -4,7 +4,7 @@
             Configuration Auto Saving
         </p>
         <button @click="resetConfiguration" class="px-4 py-1 rounded bg-red-500 text-white shadow uppercase"> 
-            Reset Configuration
+            Reset All Configuration
         </button>
     </div>
 </template>

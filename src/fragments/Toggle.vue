@@ -8,6 +8,7 @@
               v-model="config.isLock"
               type="checkbox" 
               class="bg-transparent"
+              @change="runChromeScript"
             />
             Lock
         </label>
@@ -19,6 +20,7 @@
               type="checkbox"
               class="bg-transparent"
               v-model="config.isShow"
+              @change="runChromeScript"
             />
             Show
         </label>
@@ -27,6 +29,7 @@
 
 <script setup>
   defineProps({
-    config: Object
+    config: Object,
+    runChromeScript: Function,
   })
 </script>
