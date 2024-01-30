@@ -20,6 +20,7 @@ export const useConfig = () => {
     })
     const addNewLayout = (element) => {
         layoutData.value.config.unshift({...placeholderConfig})
+        runChromeScript(layoutData.value)
         if(element[0]){
             element[0].click()
         }
@@ -27,60 +28,8 @@ export const useConfig = () => {
     const deleteLayout = (index, layoutData) => {
         if(!confirm('Are you sure you want to delete this layout?')) return
         layoutData.config.splice(index, 1)
+        runChromeScript(layoutData)
     }
-    const runWebPageScript = (layoutData) => {
-        layoutData.img = document.getElementById('_overlayImage_pixelPerfect')
-        if(!layoutData.img){
-            layoutData.img = document.createElement('img')
-        }
-
-        if(!layoutData.fileInput) {
-            layoutData.img.remove()
-            return
-        }
-
-        layoutData.img.src = layoutData.fileInput
-        layoutData.img.setAttribute('id', '_overlayImage_pixelPerfect')
-        layoutData.img.setAttribute('draggable', 'false')
-        document.body.appendChild(layoutData.img)
-
-        layoutData.img.style.cssText = `
-            width: ${layoutData.width}px;
-            height: ${layoutData.height}px;
-            left: ${layoutData.left}px;
-            top: ${layoutData.top}px;
-            opacity: ${layoutData.opacity};
-            z-index: ${layoutData.zIndex};
-            position: fixed;
-            pointer-events: ${layoutData.isLock ? 'none' : 'move'};
-            display: ${layoutData.isShow? '' : 'none'};
-        `
-        
-        let isMouseDown = false
-        let mouseDownPosition = { x: 0, y: 0}
-        let distance = { left: 0, top: 0 }
-        layoutData.img.onmousedown = function(e) {
-            mouseDownPosition.x = e.clientX
-            mouseDownPosition.y = e.clientY
-            isMouseDown = true
-        }
-        
-        layoutData.img.onmousemove = function(e) {
-            if(!isMouseDown) return
-            distance.left = e.clientX - mouseDownPosition.x
-            distance.top = e.clientY - mouseDownPosition.y
-            
-            if(layoutData){
-                layoutData.img.style.left = layoutData.left + distance.left + 'px'
-                layoutData.img.style.top = layoutData.top + distance.top + 'px'
-            }
-        }
-        
-        window.onmouseup = function() {
-            isMouseDown = false
-        }
-    }
-
 
     const storeInLocalStorage = (layoutData) => {
         localStorage.setItem('_pixelPerfectlayoutData', JSON.stringify(layoutData))
@@ -97,7 +46,8 @@ export const useConfig = () => {
         if(!confirm('Are you sure you want to reset your configuration')) return
         deleteInLocalStorage()
         layoutData.value.activeIndex = 0
-        layoutData.value.config = placeholderConfig
+        layoutData.value.config = [{...placeholderConfig}]
+        runChromeScript(layoutData.value)
     }
     
     const runChromeScript = (layoutData) => 
@@ -110,12 +60,15 @@ export const useConfig = () => {
     }
 
 
+    //receive data from background script
     chrome.runtime.onMessage.addListener((request) => {
         if(request.type == "updatedActiveLayoutData")
         {
-            const activeLayout = layoutData.value[layoutData.value.activeIndex]
+            const activeLayout = layoutData.value.config[layoutData.value.activeIndex]
             activeLayout.left = request.data.left
             activeLayout.top = request.data.top
+
+            storeInLocalStorage(layoutData.value)
         }
     })
 
@@ -127,7 +80,6 @@ export const useConfig = () => {
         loadFromLocalStorage,
         resetConfiguration,
         runChromeScript,
-        runWebPageScript,
         storeInLocalStorage,
         deleteInLocalStorage
     }

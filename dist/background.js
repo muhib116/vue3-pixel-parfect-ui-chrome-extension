@@ -1,3 +1,6 @@
+console.log('Background script is running', localStorage);
+
+
 // get data from content
 chrome.runtime.onMessage.addListener((request) => 
 {

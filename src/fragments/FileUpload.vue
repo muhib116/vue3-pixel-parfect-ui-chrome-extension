@@ -17,6 +17,7 @@
             :class="index == layoutData.activeIndex ? 'border-red-500' : 'border-gray-200'"
             @click="() => {
                 layoutData.activeIndex = index
+                runChromeScript(layoutData)
             }"
         >
             <button 
@@ -33,7 +34,7 @@
                 class="border h-full overflow-hidden block cursor-pointer relative"
             >
                 <img
-                    v-if="item.fileInput"
+                    v-if="item?.fileInput"
                     :src="item.fileInput"
                     class="w-full h-full object-cover object-left-top block rounded"
                 />
@@ -63,7 +64,7 @@
     import { inject, ref } from 'vue'
     import Icon from '@/components/Icon.vue'
 
-    const { layoutData, deleteLayout, addNewLayout, storeInLocalStorage, runChromeScript } = inject('useConfig')
+    const { layoutData, deleteLayout, addNewLayout, runChromeScript } = inject('useConfig')
 
     const inputField = ref(null)
     const handleImage = (e, item) => 
@@ -73,7 +74,6 @@
         reader.readAsDataURL(file)
         reader.onload = () => {
             item.fileInput = reader.result
-            storeInLocalStorage(layoutData.value)
             runChromeScript(layoutData.value)
         }
     }

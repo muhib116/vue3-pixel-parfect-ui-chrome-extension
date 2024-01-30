@@ -1,21 +1,23 @@
 const _updateLayoutData = (updatedActiveLayoutData) => {
-    console.log('moving layout data', updatedActiveLayoutData)
     chrome.runtime.sendMessage({
         type: 'updatedActiveLayoutData',
         data: updatedActiveLayoutData
     })
 }
 
-const runWebPageScript = (layoutData) => {
+const runWebPageScript = (layoutData) => 
+{
     const activeLayoutData = layoutData.config[layoutData.activeIndex]
+    if(!activeLayoutData || !activeLayoutData.fileInput) {
+        activeLayoutData?.img?.remove()
+        return
+    }
+
     activeLayoutData.img = document.getElementById('_overlayImage_pixelPerfect')
+
+
     if(!activeLayoutData.img){
         activeLayoutData.img = document.createElement('img')
-    }
-    
-    if(!activeLayoutData.fileInput) {
-        activeLayoutData.img.remove()
-        return
     }
 
     activeLayoutData.img.src = activeLayoutData.fileInput
@@ -38,7 +40,7 @@ const runWebPageScript = (layoutData) => {
     
     let isMouseDown = false
     let mouseDownPosition = { x: 0, y: 0}
-    let distance = { left: 0, top: 0 }
+    let distance = { x: 0, y: 0 }
     activeLayoutData.img.onmousedown = function(e) {
         mouseDownPosition.x = e.clientX
         mouseDownPosition.y = e.clientY
@@ -46,20 +48,20 @@ const runWebPageScript = (layoutData) => {
     }
     
     activeLayoutData.img.onmousemove = function(e) {
-        if (!isMouseDown) return;
+        if (!isMouseDown) return
     
-        const distanceX = e.clientX - mouseDownPosition.x;
-        const distanceY = e.clientY - mouseDownPosition.y;
+        distance.x = e.clientX - mouseDownPosition.x
+        distance.y = e.clientY - mouseDownPosition.y
     
-        activeLayoutData.left += distanceX;
-        activeLayoutData.top += distanceY;
+        activeLayoutData.left += distance.x
+        activeLayoutData.top  += distance.y
     
-        activeLayoutData.img.style.left = activeLayoutData.left + 'px';
-        activeLayoutData.img.style.top = activeLayoutData.top + 'px';
+        activeLayoutData.img.style.left = activeLayoutData.left + 'px'
+        activeLayoutData.img.style.top  = activeLayoutData.top + 'px'
     
         // Update the mouseDownPosition for the next move
-        mouseDownPosition.x = e.clientX;
-        mouseDownPosition.y = e.clientY;
+        mouseDownPosition.x = e.clientX
+        mouseDownPosition.y = e.clientY
     }    
     
     window.onmouseup = function() {
